@@ -1,0 +1,39 @@
+version: '2'
+services:
+  php:
+    image: yiisoftware/yii2-php:7.1-apache
+    volumes:
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      - ./:/app:delegated
+    ports:
+      - '8000:80'
+  mariaDB:
+        image: mariadb
+        hostname: mariadb
+        container_name: mariadb
+        restart: always
+        volumes:
+          - ./docker/mariadb/data/:/var/lib/mysql
+        command: [
+          'mysqld', '--character-set-server=utf8','--collation-server=utf8_general_ci',
+          ]
+    
+        ports:
+          - 3306:3306
+        environment:
+          - TZ=Asia/Bangkok
+          - MYSQL_ROOT_PASSWORD=docker
+          - MYSQL_USER=sa
+          - MYSQL_PASSWORD=sa
+          - MYSQL_ROOT_HOST=% 
+      
+  phpmyadmin_mariadb:
+        image: phpmyadmin/phpmyadmin
+        links:
+          - mariaDB:db
+        ports:
+          - 8200:80
+        environment:
+          MYSQL_USERNAME: root
+          MYSQL_ROOT_PASSWORD: root
+          PMA_HOST: mariaDB
