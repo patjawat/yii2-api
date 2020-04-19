@@ -6,10 +6,11 @@
     <br>
 </p>
 
-DIRECTORY STRUCTURE
+ติดตั้ง
 -------------------
-
-xx
+~~~
+composer create-project --prefer-dist yiisoft/yii2-app-basic basic
+~~~
 
 REQUIREMENTS
 ------------
