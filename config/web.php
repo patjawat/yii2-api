@@ -9,11 +9,26 @@ $config = [
     'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
-        '@npm'   => '@vendor/npm-asset',
+        '@npm' => '@vendor/npm-asset',
+    ],
+    'modules' => [
+        'user' => [
+            'class' => 'dektrium\user\Module',
+            'enableUnconfirmedLogin' => true,
+            'confirmWithin' => 21600,
+            'cost' => 12,
+            'admins' => ['admin'],
+            'modelMap' => [
+                'User' => 'app\models\User',
+            ],
+        ],
+        'admin' => [
+            'class' => 'mdm\admin\Module',
+        ]
+        
     ],
     'components' => [
         'request' => [
-            // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => '-seLtc0zvOwIY-1GnMQxspIT_si4OYgD',
         ],
         'cache' => [
@@ -22,7 +37,16 @@ $config = [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'enableSession' => true,
         ],
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+            // 'class' => 'yii\rbac\PhpManager',
+        ],
+        'jwt' => [
+            'class' => \sizeg\jwt\Jwt::class,
+            'key'   => 'secret',
+          ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
@@ -44,13 +68,23 @@ $config = [
         ],
         'db' => $db,
         /*
-        'urlManager' => [
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
-            'rules' => [
-            ],
+    'urlManager' => [
+    'enablePrettyUrl' => true,
+    'showScriptName' => false,
+    'rules' => [
+    ],
+    ],
+     */
+    ],
+    'as access' => [
+        'class' => 'mdm\admin\components\AccessControl',
+        'allowActions' => [
+            'site/index',
+            'site/logout',
+            'site/login',
+            'api/*',
+            'user/*',
         ],
-        */
     ],
     'params' => $params,
 ];
@@ -69,6 +103,7 @@ if (YII_ENV_DEV) {
         'class' => 'yii\gii\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
         //'allowedIPs' => ['127.0.0.1', '::1'],
+        'allowedIPs' => ['*'],
     ];
 }
 
