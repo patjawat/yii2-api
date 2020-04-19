@@ -20,21 +20,17 @@ class User extends ActiveRecord implements IdentityInterface
 
     public function scenarios()
     {
-		    $scenarios = parent::scenarios();
+		$scenarios = parent::scenarios();
         $scenarios['registration'] = ['username','email'];
         return $scenarios;
     }
-    /**
-     * @inheritdoc
-     */
+
     public static function tableName()
     {
         return '{{%user}}';
     }
 
-    /**
-     * @inheritdoc
-     */
+ 
     public function behaviors()
     {
         return [
@@ -42,34 +38,28 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
-    /**
-     * @inheritdoc
-     */
      public function rules()
          {
              return [
-                 //['status', 'required'],
                  ['status', 'default', 'value' => self::STATUS_ACTIVE],
                  ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
 
                  ['username', 'filter', 'filter' => 'trim'],
                  ['username', 'required'],
-                ['username', 'unique', 'targetClass' => '\app\modules\usermanager\models\User', 'message' => 'This username has already been taken.'],
+                ['username', 'unique', 'targetClass' => '\app\models\User', 'message' => 'This username has already been taken.'],
                  ['username', 'string', 'min' => 2, 'max' => 255],
 
                  ['email', 'filter', 'filter' => 'trim'],
-                //  ['email', 'required'],
                  ['email', 'email'],
-                ['email', 'unique', 'targetClass' => '\app\modules\usermanager\models\User', 'message' => 'This email address has already been taken.'],
+                ['email', 'unique', 'targetClass' => '\app\models\User', 'message' => 'This email address has already been taken.'],
 
                  ['password', 'required'],
                  ['password', 'string', 'min' => 6],
-                 ['doctor_id', 'unique'],
                  ['confirm_password', 'required'],
                  ['confirm_password', 'string', 'min' => 6],
                  ['confirm_password', 'compare','compareAttribute'=>'password'],
 
-                 [['roles','doctor_id','fullname','q','branch_id'], 'safe']
+                 [['roles'], 'safe']
 
              ];
          }
@@ -83,43 +73,25 @@ class User extends ActiveRecord implements IdentityInterface
                  'username' => 'ชื่อเข้าใช้งาน',
                  'password' => 'รหัสผ่าน',
                  'confirm_password' => 'ยืนยันรหัสผ่าน',
-                 'branch_id' =>'สาขา'
              ];
             }
-    /**
-     * @inheritdoc
-     */
+ 
     public static function findIdentity($id)
     {
         return static::findOne(['id' => $id, 'status' => self::STATUS_ACTIVE]);
     }
 
-    /**
-     * @inheritdoc
-     */
     public static function findIdentityByAccessToken($token, $type = null)
     {
         return static::findOne(['auth_key' => $token->getClaim('uid')]);
     }
 
-    /**
-     * Finds user by username
-     *
-     * @param string $username
-     * @return static|null
-     */
     public static function findByUsername($username)
     {
         return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
         // return static::findOne(['username' => $username]);
     }
 
-    /**
-     * Finds user by password reset token
-     *
-     * @param string $token password reset token
-     * @return static|null
-     */
     public static function findByPasswordResetToken($token)
     {
         if (!static::isPasswordResetTokenValid($token)) {
@@ -131,13 +103,7 @@ class User extends ActiveRecord implements IdentityInterface
             'status' => self::STATUS_ACTIVE,
         ]);
     }
-
-    /**
-     * Finds out if password reset token is valid
-     *
-     * @param string $token password reset token
-     * @return boolean
-     */
+    
     public static function isPasswordResetTokenValid($token)
     {
         if (empty($token)) {
@@ -149,70 +115,41 @@ class User extends ActiveRecord implements IdentityInterface
         return $timestamp + $expire >= time();
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getId()
     {
         return $this->getPrimaryKey();
     }
 
-    /**
-     * @inheritdoc
-     */
     public function getAuthKey()
     {
         return $this->auth_key;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function validateAuthKey($authKey)
     {
         return $this->getAuthKey() === $authKey;
     }
 
-    /**
-     * Validates password
-     *
-     * @param string $password password to validate
-     * @return boolean if password provided is valid for current user
-     */
     public function validatePassword($password)
     {
         return Yii::$app->security->validatePassword($password, $this->password_hash);
     }
 
-    /**
-     * Generates password hash from password and sets it to the model
-     *
-     * @param string $password
-     */
     public function setPassword($password)
     {
         $this->password_hash = Yii::$app->security->generatePasswordHash($password);
     }
 
-    /**
-     * Generates "remember me" authentication key
-     */
     public function generateAuthKey()
     {
         $this->auth_key = Yii::$app->security->generateRandomString();
     }
 
-    /**
-     * Generates new password reset token
-     */
     public function generatePasswordResetToken()
     {
         $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
     }
 
-    /**
-     * Removes password reset token
-     */
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;

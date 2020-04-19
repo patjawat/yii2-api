@@ -29,7 +29,6 @@ $config = [
     ],
     'components' => [
         'request' => [
-            // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => '-seLtc0zvOwIY-1GnMQxspIT_si4OYgD',
         ],
         'cache' => [
@@ -37,13 +36,12 @@ $config = [
         ],
         'user' => [
             'identityClass' => 'app\models\User',
-            // 'identityClass' => 'dektrium\user\models\User',
             'enableAutoLogin' => true,
-            'enableSession' => true, //ใช้ jwt ต้องเป็น false
+            'enableSession' => true,
         ],
         'authManager' => [
-            // 'class' => 'yii\rbac\DbManager',
-            'class' => 'yii\rbac\PhpManager',
+            'class' => 'yii\rbac\DbManager',
+            // 'class' => 'yii\rbac\PhpManager',
         ],
         'jwt' => [
             'class' => \sizeg\jwt\Jwt::class,
