@@ -11,6 +11,12 @@
 ~~~
 composer update
 ~~~
+database
+-------------------
+~~~
+backupDB/yii2basic.sql
+~~~
+
 
 start project
 ------------
